@@ -50,10 +50,10 @@ impl Node {
 
     fn insert(&mut self, x: Element) {
         if (self.x.1, self.x.0) < (x.1, x.0) {
-            if let Some(left) = &mut self.left {
-                left.insert(x);
+            if let Some(right) = &mut self.right {
+                right.insert(x);
             } else {
-                self.left = Some(Box::new(Node {
+                self.right = Some(Box::new(Node {
                     x,
                     priority: random_10_7(),
                     left: None,
@@ -73,6 +73,88 @@ impl Node {
             }
         }
         self.rotate();
+    }
+}
+
+pub struct Treap {
+    root: Option<Box<Node>>,
+}
+
+impl Treap {
+    pub fn new() -> Self {
+        Self { root: None }
+    }
+
+    pub fn insert(&mut self, x: Element) {
+        if let Some(root) = &mut self.root {
+            root.insert(x);
+        } else {
+            self.root = Some(Box::new(Node {
+                x,
+                priority: random_10_7(),
+                left: None,
+                right: None,
+            }));
+        }
+    }
+
+    pub fn delete(&mut self, k: Key) {
+        let mut node = &mut self.root;
+        let mut node = loop {
+            if node.is_some() {
+                if node.as_ref().unwrap().x.1 < k {
+                    node = &mut node.as_mut().unwrap().left;
+                } else if node.as_ref().unwrap().x.1 > k {
+                    node = &mut node.as_mut().unwrap().right;
+                } else {
+                    break node;
+                }
+            } else {
+                return;
+            }
+        };
+        // set priority to inf
+        node.as_mut().unwrap().priority = u32::MAX;
+        loop {
+            match node.as_mut().unwrap().rotate() {
+                RotateResult::Same => break,
+                RotateResult::Left => node = &mut node.as_mut().unwrap().left,
+                RotateResult::Right => node = &mut node.as_mut().unwrap().right,
+            }
+        }
+        *node = None;
+    }
+
+    /// Rust does not have NULL so I have to replace it with Option::None
+    pub fn search(&self, k: Key) -> Option<Element> {
+        let mut node = &self.root;
+        while let Some(n) = node {
+            if k < n.x.1 {
+                node = &n.left;
+            } else if n.x.1 < k {
+                node = &n.right;
+            } else {
+                return Some(n.x);
+            }
+        }
+        None
+    }
+
+    pub fn get_depths(&self) -> Vec<usize> {
+        let mut depths = Vec::new();
+        fn traverse(node: &Box<Node>, depth: usize, depths: &mut Vec<usize>) {
+            depths.push(depth);
+            if let Some(node) = &node.right {
+                traverse(node, depth + 1, depths);
+            }
+            if let Some(node) = &node.left {
+                traverse(node, depth + 1, depths);
+            }
+        }
+        if let Some(root) = &self.root {
+            traverse(root, 0, &mut depths);
+        }
+        depths
     }
 }
 
@@ -163,69 +245,4 @@ fn test_node() {
             .priority,
         6
     );
-}
-
-pub struct Treap {
-    root: Option<Box<Node>>,
-}
-
-impl Treap {
-    pub fn new() -> Self {
-        Self { root: None }
-    }
-
-    pub fn insert(&mut self, x: Element) {
-        if let Some(root) = &mut self.root {
-            root.insert(x);
-        } else {
-            self.root = Some(Box::new(Node {
-                x,
-                priority: random_10_7(),
-                left: None,
-                right: None,
-            }));
-        }
-    }
-
-    pub fn delete(&mut self, k: Key) {
-        let mut node = &mut self.root;
-        let mut node = loop {
-            if node.is_some() {
-                if node.as_ref().unwrap().x.1 < k {
-                    node = &mut node.as_mut().unwrap().left;
-                } else if node.as_ref().unwrap().x.1 > k {
-                    node = &mut node.as_mut().unwrap().right;
-                } else {
-                    break node;
-                }
-            } else {
-                return;
-            }
-        };
-        // set priority to inf
-        node.as_mut().unwrap().priority = u32::MAX;
-        loop {
-            match node.as_mut().unwrap().rotate() {
-                RotateResult::Same => break,
-                RotateResult::Left => node = &mut node.as_mut().unwrap().left,
-                RotateResult::Right => node = &mut node.as_mut().unwrap().right,
-            }
-        }
-        *node = None;
-    }
-
-    /// Rust does not have NULL so I have to replace it with Option::None
-    pub fn search(&self, k: Key) -> Option<Element> {
-        let mut node = &self.root;
-        while let Some(n) = node {
-            if n.x.1 < k {
-                node = &n.left;
-            } else if n.x.1 > k {
-                node = &n.right;
-            } else {
-                return Some(n.x);
-            }
-        }
-        None
-    }
 }
