@@ -1,6 +1,6 @@
-use rand::{distributions::Uniform, prelude::Distribution, Rng};
+use rand::Rng;
 
-use crate::{Element, Key, ID};
+use crate::{Element, Key, ID, random::random_10_7};
 
 /// I did not follow the spec on the interface of DataGenerator because I
 /// believe the idea behind tuple of (int, key/element) is meant to be enums
@@ -14,20 +14,18 @@ pub enum Action {
 pub struct DataGenerator {
     generated: Vec<Option<Key>>,
     next_id: ID,
-    dist: Uniform<Key>,
 }
 
 impl DataGenerator {
     pub fn new() -> Self {
         Self {
             next_id: 1,
-            dist: Uniform::from(0..=10_000_000),
             generated: Vec::new(),
         }
     }
 
     fn gen_key(&self) -> Key {
-        self.dist.sample(&mut rand::thread_rng())
+        random_10_7()
     }
 
     pub fn gen_element(&mut self) -> Element {
