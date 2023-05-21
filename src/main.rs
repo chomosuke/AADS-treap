@@ -7,4 +7,6 @@ type ID = u64;
 type Key = u32;
 type Element = (ID, Key);
 
-fn main() {}
+fn main() {
+
+}

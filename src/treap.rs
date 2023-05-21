@@ -76,6 +76,95 @@ impl Node {
     }
 }
 
+#[test]
+fn test_node() {
+    let mut node = Node {
+        x: (0, 1),
+        priority: 3,
+        left: Some(Box::new(Node {
+            x: (0, 1),
+            priority: 2,
+            left: Some(Box::new(Node {
+                x: (0, 1),
+                priority: 5,
+                left: None,
+                right: None,
+            })),
+            right: Some(Box::new(Node {
+                x: (0, 1),
+                priority: 6,
+                left: None,
+                right: None,
+            })),
+        })),
+        right: Some(Box::new(Node {
+            x: (0, 1),
+            priority: 4,
+            left: None,
+            right: None,
+        })),
+    };
+    assert!(matches!(node.rotate(), RotateResult::Right));
+    assert_eq!(node.priority, 2);
+    assert_eq!(node.left.as_ref().unwrap().priority, 5);
+    assert_eq!(node.right.as_ref().unwrap().priority, 3);
+    assert_eq!(
+        node.right
+            .as_ref()
+            .unwrap()
+            .right
+            .as_ref()
+            .unwrap()
+            .priority,
+        4
+    );
+    assert_eq!(
+        node.right.as_ref().unwrap().left.as_ref().unwrap().priority,
+        6
+    );
+
+    node.left.as_mut().unwrap().priority = 1;
+    node.rotate();
+    assert_eq!(node.priority, 1);
+    assert_eq!(node.right.as_ref().unwrap().priority, 2);
+    assert_eq!(
+        node.right
+            .as_ref()
+            .unwrap()
+            .right
+            .as_ref()
+            .unwrap()
+            .priority,
+        3
+    );
+    assert_eq!(
+        node.right
+            .as_ref()
+            .unwrap()
+            .right
+            .as_ref()
+            .unwrap()
+            .right
+            .as_ref()
+            .unwrap()
+            .priority,
+        4
+    );
+    assert_eq!(
+        node.right
+            .as_ref()
+            .unwrap()
+            .right
+            .as_ref()
+            .unwrap()
+            .left
+            .as_ref()
+            .unwrap()
+            .priority,
+        6
+    );
+}
+
 pub struct Treap {
     root: Option<Box<Node>>,
 }
