@@ -44,8 +44,10 @@ fn experiment_0() {
         }
         let depths = treap.get_depths();
         println!(
-            "{}",
-            depths.iter().sum::<usize>() as f64 / depths.len() as f64
+            "{},{},{}",
+            depths.iter().sum::<usize>() as f64 / depths.len() as f64,
+            depths.iter().max().unwrap(),
+            treap.get_depth(512).unwrap(),
         );
     }
 }
@@ -66,17 +68,14 @@ fn experiment_1() {
         for &e in &es {
             treap.insert(e);
         }
-        println!("{num_ins} insertions into treap took: {:?}", now.elapsed());
+        print!("{num_ins},{}", now.elapsed().as_millis());
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
         for &e in &es {
             dynamic_array.insert(e);
         }
-        println!(
-            "{num_ins} insertions into dynamic array took: {:?}",
-            now.elapsed()
-        );
+        println!(",{}", now.elapsed().as_millis());
     }
 }
 
@@ -102,11 +101,7 @@ fn experiment_2() {
                 Action::Search(_) => unreachable!(),
             }
         }
-        println!(
-            "{}% deletions for treap took: {:?}",
-            p_del * 100.0,
-            now.elapsed()
-        );
+        print!("{}%,{}", p_del * 100.0, now.elapsed().as_millis());
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -117,11 +112,7 @@ fn experiment_2() {
                 Action::Search(_) => unreachable!(),
             }
         }
-        println!(
-            "{}% deletions for dynamic array took: {:?}",
-            p_del * 100.0,
-            now.elapsed(),
-        );
+        println!(",{}", now.elapsed().as_millis());
     }
 }
 
@@ -149,11 +140,7 @@ fn experiment_3() {
                 }
             }
         }
-        println!(
-            "{}% searches for treap took: {:?}",
-            p_del * 100.0,
-            now.elapsed()
-        );
+        print!("{}%,{}", p_del * 100.0, now.elapsed().as_millis());
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -166,11 +153,7 @@ fn experiment_3() {
                 }
             }
         }
-        println!(
-            "{}% searches for dynamic array took: {:?}",
-            p_del * 100.0,
-            now.elapsed(),
-        );
+        println!(",{}", now.elapsed().as_millis());
     }
 }
 
@@ -202,10 +185,7 @@ fn experiment_4() {
                 }
             }
         }
-        println!(
-            "{num_ins} ops with 5% deleletion & 5% search for treap took: {:?}",
-            now.elapsed()
-        );
+        print!("{num_ins},{}", now.elapsed().as_millis());
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -218,9 +198,6 @@ fn experiment_4() {
                 }
             }
         }
-        println!(
-            "{num_ins} ops with 5% deleletion & 5% search for dynamic array took: {:?}",
-            now.elapsed(),
-        );
+        println!(",{}", now.elapsed().as_millis());
     }
 }

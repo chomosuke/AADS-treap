@@ -156,6 +156,22 @@ impl Treap {
         }
         depths
     }
+
+    pub fn get_depth(&self, k: Key) -> Option<usize> {
+        let mut depth = 0;
+        let mut node = &self.root;
+        while let Some(n) = node {
+            if k < n.x.1 {
+                node = &n.left;
+            } else if n.x.1 < k {
+                node = &n.right;
+            } else {
+                return Some(depth);
+            }
+            depth += 1;
+        }
+        None
+    }
 }
 
 #[test]
