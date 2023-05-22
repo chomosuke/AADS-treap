@@ -30,6 +30,10 @@ fn main() {
     let now = Instant::now();
     experiment_3();
     println!("Experiment 3 took: {:?}", now.elapsed());
+
+    let now = Instant::now();
+    experiment_4();
+    println!("Experiment 4 took: {:?}", now.elapsed());
 }
 
 fn experiment_0() {
@@ -81,7 +85,7 @@ fn experiment_2() {
     for p_del in [0.001, 0.005, 0.01, 0.05, 0.1] {
         let mut es = Vec::with_capacity(1_000_000);
         for _ in 0..1_000_000 {
-            let a = if rand::random::<f64>() < p_del {
+            let a = if rand::random::<f32>() < p_del {
                 data_generator.gen_deletion()
             } else {
                 data_generator.gen_insertion()
@@ -126,7 +130,7 @@ fn experiment_3() {
     for p_del in [0.001, 0.005, 0.01, 0.05, 0.1] {
         let mut es = Vec::with_capacity(1_000_000);
         for _ in 0..1_000_000 {
-            let a = if rand::random::<f64>() < p_del {
+            let a = if rand::random::<f32>() < p_del {
                 data_generator.gen_search()
             } else {
                 data_generator.gen_insertion()
@@ -165,6 +169,57 @@ fn experiment_3() {
         println!(
             "{}% searches for dynamic array took: {:?}",
             p_del * 100.0,
+            now.elapsed(),
+        );
+    }
+}
+
+fn experiment_4() {
+    let mut data_generator = DataGenerator::new();
+    for num_ins in [100_000, 200_000, 500_000, 800_000, 1_000_000] {
+        let mut es = Vec::with_capacity(num_ins);
+        for _ in 0..num_ins {
+            let a = if rand::random::<f32>() < 0.1 {
+                if rand::random::<f32>() < 0.5 {
+                    data_generator.gen_deletion()
+                } else {
+                    data_generator.gen_search()
+                }
+            } else {
+                data_generator.gen_insertion()
+            };
+            es.push(a);
+        }
+
+        let now = Instant::now();
+        let mut treap = Treap::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => treap.insert(e),
+                Action::Deletion(k) => treap.delete(k),
+                Action::Search(k) => {
+                    treap.search(k);
+                }
+            }
+        }
+        println!(
+            "{num_ins} ops with 5% deleletion & 5% search for treap took: {:?}",
+            now.elapsed()
+        );
+
+        let now = Instant::now();
+        let mut dynamic_array = DynamicArray::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => dynamic_array.insert(e),
+                Action::Deletion(k) => dynamic_array.delete(k),
+                Action::Search(k) => {
+                    dynamic_array.search(k);
+                }
+            }
+        }
+        println!(
+            "{num_ins} ops with 5% deleletion & 5% search for dynamic array took: {:?}",
             now.elapsed(),
         );
     }
