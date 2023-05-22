@@ -3,7 +3,7 @@ use std::time::Instant;
 use data_generator::DataGenerator;
 use treap::Treap;
 
-use crate::data_generator::Action;
+use crate::{data_generator::Action, dynamic_array::DynamicArray};
 
 mod data_generator;
 mod dynamic_array;
@@ -45,11 +45,19 @@ fn experiment_1() {
                 _ => panic!(),
             }
         }
+
         let now = Instant::now();
         let mut treap = Treap::new();
-        for e in es {
+        for &e in &es {
             treap.insert(e);
         }
         println!("{num_ins} insertions into treap took: {:?}", now.elapsed());
+
+        let now = Instant::now();
+        let mut dynamic_array = DynamicArray::new();
+        for &e in &es {
+            dynamic_array.insert(e);
+        }
+        println!("{num_ins} insertions into dynamic array took: {:?}", now.elapsed());
     }
 }
