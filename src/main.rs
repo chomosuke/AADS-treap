@@ -26,6 +26,10 @@ fn main() {
     let now = Instant::now();
     experiment_2();
     println!("Experiment 2 took: {:?}", now.elapsed());
+
+    let now = Instant::now();
+    experiment_3();
+    println!("Experiment 3 took: {:?}", now.elapsed());
 }
 
 fn experiment_0() {
@@ -111,6 +115,55 @@ fn experiment_2() {
         }
         println!(
             "{}% deletions for dynamic array took: {:?}",
+            p_del * 100.0,
+            now.elapsed(),
+        );
+    }
+}
+
+fn experiment_3() {
+    let mut data_generator = DataGenerator::new();
+    for p_del in [0.001, 0.005, 0.01, 0.05, 0.1] {
+        let mut es = Vec::with_capacity(1_000_000);
+        for _ in 0..1_000_000 {
+            let a = if rand::random::<f64>() < p_del {
+                data_generator.gen_search()
+            } else {
+                data_generator.gen_insertion()
+            };
+            es.push(a);
+        }
+
+        let now = Instant::now();
+        let mut treap = Treap::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => treap.insert(e),
+                Action::Deletion(_) => unreachable!(),
+                Action::Search(k) => {
+                    treap.search(k);
+                }
+            }
+        }
+        println!(
+            "{}% searches for treap took: {:?}",
+            p_del * 100.0,
+            now.elapsed()
+        );
+
+        let now = Instant::now();
+        let mut dynamic_array = DynamicArray::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => dynamic_array.insert(e),
+                Action::Deletion(_) => unreachable!(),
+                Action::Search(k) => {
+                    dynamic_array.search(k);
+                }
+            }
+        }
+        println!(
+            "{}% searches for dynamic array took: {:?}",
             p_del * 100.0,
             now.elapsed(),
         );
