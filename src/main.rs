@@ -22,6 +22,10 @@ fn main() {
     let now = Instant::now();
     experiment_1();
     println!("Experiment 1 took: {:?}", now.elapsed());
+
+    let now = Instant::now();
+    experiment_2();
+    println!("Experiment 2 took: {:?}", now.elapsed());
 }
 
 fn experiment_0() {
@@ -31,7 +35,10 @@ fn experiment_0() {
             treap.insert((i as u64, i));
         }
         let depths = treap.get_depths();
-        println!("{}", depths.iter().sum::<usize>() as f64 / depths.len() as f64);
+        println!(
+            "{}",
+            depths.iter().sum::<usize>() as f64 / depths.len() as f64
+        );
     }
 }
 
@@ -42,7 +49,7 @@ fn experiment_1() {
         for _ in 0..num_ins {
             match data_generator.gen_insertion() {
                 Action::Insertion(e) => es.push(e),
-                _ => panic!(),
+                _ => unreachable!(),
             }
         }
 
@@ -58,6 +65,54 @@ fn experiment_1() {
         for &e in &es {
             dynamic_array.insert(e);
         }
-        println!("{num_ins} insertions into dynamic array took: {:?}", now.elapsed());
+        println!(
+            "{num_ins} insertions into dynamic array took: {:?}",
+            now.elapsed()
+        );
+    }
+}
+
+fn experiment_2() {
+    let mut data_generator = DataGenerator::new();
+    for p_del in [0.001, 0.005, 0.01, 0.05, 0.1] {
+        let mut es = Vec::with_capacity(1_000_000);
+        for _ in 0..1_000_000 {
+            let a = if rand::random::<f64>() < p_del {
+                data_generator.gen_deletion()
+            } else {
+                data_generator.gen_insertion()
+            };
+            es.push(a);
+        }
+
+        let now = Instant::now();
+        let mut treap = Treap::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => treap.insert(e),
+                Action::Deletion(k) => treap.delete(k),
+                Action::Search(_) => unreachable!(),
+            }
+        }
+        println!(
+            "{}% deletions for treap took: {:?}",
+            p_del * 100.0,
+            now.elapsed()
+        );
+
+        let now = Instant::now();
+        let mut dynamic_array = DynamicArray::new();
+        for &e in &es {
+            match e {
+                Action::Insertion(e) => dynamic_array.insert(e),
+                Action::Deletion(k) => dynamic_array.delete(k),
+                Action::Search(_) => unreachable!(),
+            }
+        }
+        println!(
+            "{}% deletions for dynamic array took: {:?}",
+            p_del * 100.0,
+            now.elapsed(),
+        );
     }
 }

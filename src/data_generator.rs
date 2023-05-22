@@ -5,6 +5,7 @@ use crate::{Element, Key, ID, random::random_10_7};
 /// I did not follow the spec on the interface of DataGenerator because I
 /// believe the idea behind tuple of (int, key/element) is meant to be enums
 /// anyway.
+#[derive(Clone, Copy)]
 pub enum Action {
     Insertion(Element),
     Deletion(Key),
