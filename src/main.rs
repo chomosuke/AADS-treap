@@ -121,10 +121,10 @@ fn experiment_2() {
 
 fn experiment_3() {
     let mut data_generator = DataGenerator::new();
-    for p_del in [0.001, 0.005, 0.01, 0.05, 0.1] {
+    for p_ser in [0.001, 0.005, 0.01, 0.05, 0.1] {
         let mut es = Vec::with_capacity(1_000_000);
         for _ in 0..1_000_000 {
-            let a = if rand::random::<f32>() < p_del {
+            let a = if rand::random::<f32>() < p_ser {
                 data_generator.gen_search()
             } else {
                 data_generator.gen_insertion()
@@ -143,7 +143,7 @@ fn experiment_3() {
                 }
             }
         }
-        print!("{}%,{}", p_del * 100.0, now.elapsed().as_millis());
+        print!("{}%,{}", p_ser * 100.0, now.elapsed().as_millis());
         treap.validate();
 
         let now = Instant::now();

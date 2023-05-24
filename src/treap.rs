@@ -16,32 +16,57 @@ enum RotateResult {
 }
 
 impl Node {
+    fn rotate_left(&mut self) {
+        // disconnect right with self
+        let mut right = *self.right.take().unwrap();
+        // self is now right
+        mem::swap(&mut right, self);
+        let mut prev_self = right;
+        // self's left is prev_self's right
+        prev_self.right = self.left.take();
+        // prev_self is now self's left
+        self.left = Some(Box::new(prev_self));
+    }
+    fn rotate_right(&mut self) {
+        let mut left = *self.left.take().unwrap();
+        mem::swap(&mut left, self);
+        let mut prev_self = left;
+        prev_self.left = self.right.take();
+        self.right = Some(Box::new(prev_self));
+    }
     fn rotate(&mut self) -> RotateResult {
-        if let Some(left) = &self.left {
-            if self.get_priority() > left.get_priority() {
-                let mut left = *self.left.take().unwrap();
-                mem::swap(&mut left, self);
-                let mut prev_self = left;
-                prev_self.left = self.right.take();
-                self.right = Some(Box::new(prev_self));
-                return RotateResult::Right;
+        match (&self.left, &self.right) {
+            (Some(left), Some(right)) => {
+                if self.get_priority() < right.get_priority()
+                    && self.get_priority() < left.get_priority()
+                {
+                    RotateResult::Same
+                } else if left.get_priority() < right.get_priority() {
+                    self.rotate_right();
+                    RotateResult::Right
+                } else {
+                    self.rotate_left();
+                    RotateResult::Left
+                }
             }
-        }
-        if let Some(right) = &self.right {
-            if self.get_priority() > right.get_priority() {
-                // disconnect right with self
-                let mut right = *self.right.take().unwrap();
-                // self is now right
-                mem::swap(&mut right, self);
-                let mut prev_self = right;
-                // self's left is prev_self's right
-                prev_self.right = self.left.take();
-                // prev_self is now self's left
-                self.left = Some(Box::new(prev_self));
-                return RotateResult::Left;
+            (Some(left), None) => {
+                if left.get_priority() < self.get_priority() {
+                    self.rotate_right();
+                    RotateResult::Right
+                } else {
+                    RotateResult::Same
+                }
             }
+            (None, Some(right)) => {
+                if right.get_priority() < self.get_priority() {
+                    self.rotate_left();
+                    RotateResult::Left
+                } else {
+                    RotateResult::Same
+                }
+            }
+            _ => RotateResult::Same,
         }
-        RotateResult::Same
     }
 
     fn get_priority(&self) -> (u32, Key, ID) {
