@@ -42,6 +42,7 @@ fn experiment_0() {
         for i in 1..=1024 {
             treap.insert((i as u64, i));
         }
+        treap.validate();
         let depths = treap.get_depths();
         println!(
             "{},{},{}",
@@ -69,6 +70,7 @@ fn experiment_1() {
             treap.insert(e);
         }
         print!("{num_ins},{}", now.elapsed().as_millis());
+        treap.validate();
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -102,6 +104,7 @@ fn experiment_2() {
             }
         }
         print!("{}%,{}", p_del * 100.0, now.elapsed().as_millis());
+        treap.validate();
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -141,6 +144,7 @@ fn experiment_3() {
             }
         }
         print!("{}%,{}", p_del * 100.0, now.elapsed().as_millis());
+        treap.validate();
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();
@@ -186,6 +190,7 @@ fn experiment_4() {
             }
         }
         print!("{num_ins},{}", now.elapsed().as_millis());
+        treap.validate();
 
         let now = Instant::now();
         let mut dynamic_array = DynamicArray::new();

@@ -74,6 +74,28 @@ impl Node {
         }
         self.rotate();
     }
+
+    fn validate_heap(&self) {
+        if let Some(n) = &self.left {
+            assert!(n.get_priority() > self.get_priority());
+            n.validate_heap();
+        }
+        if let Some(n) = &self.right {
+            assert!(n.get_priority() > self.get_priority());
+            n.validate_heap();
+        }
+    }
+
+    fn validate_bst(&self, min: Element, max: Element) {
+        assert!((min.1, min.0) < (self.x.1, self.x.0));
+        assert!((max.1, max.0) > (self.x.1, self.x.0));
+        if let Some(n) = &self.left {
+            n.validate_bst(min, self.x);
+        }
+        if let Some(n) = &self.right {
+            n.validate_bst(self.x, max);
+        }
+    }
 }
 
 pub struct Treap {
@@ -171,6 +193,13 @@ impl Treap {
             depth += 1;
         }
         None
+    }
+
+    pub fn validate(&self) {
+        if let Some(n) = &self.root {
+            n.validate_heap();
+            n.validate_bst((u64::MIN, u32::MIN), (u64::MAX, u32::MAX));
+        }
     }
 }
 
