@@ -37,19 +37,24 @@ fn main() {
 }
 
 fn experiment_0() {
+    let mut all_depth = vec![Vec::new(); 1024];
     for _ in 0..100 {
         let mut treap = Treap::new();
         for i in 1..=1024 {
             treap.insert((i as u64, i));
         }
         treap.validate();
-        let depths = treap.get_depths();
+        for i in 0..1024 {
+            all_depth[i].push(treap.get_depth(i as u32 + 1).unwrap());
+        }
         println!(
-            "{},{},{}",
-            depths.iter().sum::<usize>() as f64 / depths.len() as f64,
-            depths.iter().max().unwrap(),
+            "{},{}",
             treap.get_depth(512).unwrap(),
+            treap.get_depths().iter().max().unwrap() + 1,
         );
+    }
+    for d in all_depth{
+        println!("{}", d.iter().sum::<usize>() as f64 / d.len() as f64);
     }
 }
 
