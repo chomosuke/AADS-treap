@@ -48,10 +48,10 @@ impl Node {
         (self.priority, self.x.1, self.x.0)
     }
 
-    fn insert(&mut self, x: Element) {
-        if (self.x.1, self.x.0) < (x.1, x.0) {
+    fn insert(&mut self, x: Element) -> bool {
+        let need_rotate = if (self.x.1, self.x.0) < (x.1, x.0) {
             if let Some(right) = &mut self.right {
-                right.insert(x);
+                right.insert(x)
             } else {
                 self.right = Some(Box::new(Node {
                     x,
@@ -59,10 +59,11 @@ impl Node {
                     left: None,
                     right: None,
                 }));
+                true
             }
         } else {
             if let Some(left) = &mut self.left {
-                left.insert(x);
+                left.insert(x)
             } else {
                 self.left = Some(Box::new(Node {
                     x,
@@ -70,9 +71,14 @@ impl Node {
                     left: None,
                     right: None,
                 }));
+                true
             }
+        };
+        if need_rotate {
+            !matches!(self.rotate(), RotateResult::Same)
+        } else {
+            false
         }
-        self.rotate();
     }
 
     fn validate_heap(&self) {
